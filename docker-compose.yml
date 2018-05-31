@@ -1,0 +1,20 @@
+version: '3.0'
+services:
+    php-app:
+        image: php:7.1-fpm
+        volumes:
+            - ./php-app:/web/php-app
+            - ./ruby-app:/web/ruby-app
+    ruby-app:
+        image: ruby:2.2.0
+        working_dir: /web/ruby-app
+        command: ['bash', '-c', 'bundle install && bundle exec puma config.ru -p 80 -e production']
+        volumes:
+            - ./ruby-app:/web/ruby-app
+    nginx:
+        image: nginx:1.10
+        volumes:
+            - ./php-app:/web/php-app
+            - ./docker/nginx/nginx-site.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "8087:80"
